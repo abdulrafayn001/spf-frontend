@@ -3,7 +3,6 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -17,29 +16,20 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Icons } from "@/components/ui/icons";
-
-const formSchema = z.object({
-  firstName: z.string().min(2, {
-    message: "First name must be at least 2 characters long.",
-  }),
-  lastName: z.string().min(2, {
-    message: "Last name must be at least 2 characters long.",
-  }),
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-  password: z.string().min(8, {
-    message: "Password must be at least 8 characters long.",
-  }),
-});
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import { signUpFormSchema } from "@/validations/authSchemas";
+import { SignUpPayload } from "@/types/auth";
 
 type SignUpFormProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function SignUpForm({ className, ...props }: SignUpFormProps) {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const { signUp } = useAuth();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const router = useRouter();
+
+  const form = useForm<SignUpPayload>({
+    resolver: zodResolver(signUpFormSchema),
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -48,14 +38,9 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true);
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    setIsLoading(false);
-    console.log(values);
+  async function onSubmit(values: SignUpPayload) {
+    await signUp.mutateAsync(values);
+    router.push("/profile");
   }
 
   return (
@@ -69,7 +54,11 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
               <FormItem>
                 <FormLabel>First Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="John" disabled={isLoading} {...field} />
+                  <Input
+                    placeholder="John"
+                    disabled={signUp.isPending}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -82,7 +71,11 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
               <FormItem>
                 <FormLabel>Last Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Doe" disabled={isLoading} {...field} />
+                  <Input
+                    placeholder="Doe"
+                    disabled={signUp.isPending}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -101,7 +94,7 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
                     autoCapitalize="none"
                     autoComplete="email"
                     autoCorrect="off"
-                    disabled={isLoading}
+                    disabled={signUp.isPending}
                     {...field}
                   />
                 </FormControl>
@@ -120,7 +113,7 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
                     type="password"
                     autoCapitalize="none"
                     autoComplete="new-password"
-                    disabled={isLoading}
+                    disabled={signUp.isPending}
                     {...field}
                   />
                 </FormControl>
@@ -128,8 +121,8 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
               </FormItem>
             )}
           />
-          <Button type="submit" disabled={isLoading} className="w-full">
-            {isLoading && (
+          <Button type="submit" disabled={signUp.isPending} className="w-full">
+            {signUp.isPending && (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             )}
             Sign Up

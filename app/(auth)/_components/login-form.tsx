@@ -3,7 +3,6 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -17,37 +16,30 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Icons } from "@/components/ui/icons";
-
-const formSchema = z.object({
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-  password: z.string().min(8, {
-    message: "Password must be at least 8 characters long.",
-  }),
-});
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import { signInFormSchema } from "@/validations/authSchemas";
+import { SignInPayload } from "@/types/auth";
 
 type LoginFormProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function LoginForm({ className, ...props }: LoginFormProps) {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const { signIn } = useAuth();
+  const { isPending: isLoading } = signIn;
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const router = useRouter();
+
+  const form = useForm<SignInPayload>({
+    resolver: zodResolver(signInFormSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true);
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    setIsLoading(false);
-    console.log(values);
+  async function onSubmit(values: SignInPayload) {
+    await signIn.mutateAsync(values);
+    router.push("/profile");
   }
 
   return (
