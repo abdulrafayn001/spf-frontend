@@ -6,3 +6,8 @@ export const setToken = (token: string) =>
 export const removeToken = () => localStorage.removeItem("access_token");
 
 export const isAuthenticated = () => !!getToken();
+
+export const signOut = (callback?: () => void) => {
+  removeToken();
+  callback?.();
+};
