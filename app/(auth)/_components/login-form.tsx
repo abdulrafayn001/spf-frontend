@@ -39,7 +39,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
 
   async function onSubmit(values: SignInPayload) {
     await signIn.mutateAsync(values);
-    router.push("/profile");
+    router.push("/dashboard");
   }
 
   return (
