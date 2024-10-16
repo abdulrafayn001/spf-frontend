@@ -17,7 +17,7 @@ export type NavigationItem = {
 
 export const navigation: NavigationItem[] = [
   { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
-  { name: "Profile", href: "/profile", icon: UserIcon },
+  { name: "Profile", href: "/dashboard/profile", icon: UserIcon },
   { name: "Accounts", href: "/accounts", icon: CreditCardIcon },
   { name: "Analytics", href: "/analytics", icon: ChartBarIcon },
   { name: "Settings", href: "/settings", icon: CogIcon },

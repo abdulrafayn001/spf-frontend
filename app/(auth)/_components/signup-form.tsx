@@ -40,7 +40,7 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
 
   async function onSubmit(values: SignUpPayload) {
     await signUp.mutateAsync(values);
-    router.push("/profile");
+    router.push("/dashboard");
   }
 
   return (

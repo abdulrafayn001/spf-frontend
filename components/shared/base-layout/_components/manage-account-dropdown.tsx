@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { signOut } from "@/lib/utils/auth";
+import { getQueryClient } from "@/lib/utils/queryClient";
 
 const ManageAccountDropdown = () => {
   const { toast } = useToast();
@@ -20,6 +21,7 @@ const ManageAccountDropdown = () => {
 
   const logOut = async () => {
     return signOut(() => {
+      getQueryClient().clear();
       router.push("/signin");
       toast({
         title: "Logged out",
